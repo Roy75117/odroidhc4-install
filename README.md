@@ -291,6 +291,7 @@ Coming soon...
 Coming soon...
 
 ## 7. Arm License Server (FlexLM)
+https://developer.arm.com/documentation/dui0209/j/setting-up-a-floating-license-server/starting-the-license-server
 
 ### 7-a. Request Arm license
 Please contact license.support@arm.com for detail of acquiring Arm License.
