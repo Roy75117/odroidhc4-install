@@ -290,6 +290,26 @@ Coming soon...
 ### 6-c. Testing to push/pull
 Coming soon...
 
+## 7. Arm License Server (FlexLM)
+
+### 7-a Request Arm license
+Please contact license.support@arm.com for detail of acquiring Arm License.
+Or refer this site : https://developer.arm.com/support/licensing
+
+### 7-b Download License Server Management Software(FlexNet Publisher)
+TBD
+
+### 7-c Setting Up a Floating License Server
+#### 7-c-1 Installing the server software
+#### 7-c-2 Installing the server license
+#### 7-c-3 Starting the license server
+#### 7-c-4 Shutting down the license server
+
+### 7-d Troubleshooting & Debug
+
+
 ## Appendix Revision history
+- v2.0: Add Arm License server installation
 - v1.1: update for stability and multi-platform support(Win10 docker and RPi4 native), 2020-Jan-30
 - v1.0: initial version, 2021-Jan-19
+
