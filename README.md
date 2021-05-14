@@ -292,24 +292,137 @@ Coming soon...
 
 ## 7. Arm License Server (FlexLM)
 
-### 7-a Request Arm license
+### 7-a. Request Arm license
 Please contact license.support@arm.com for detail of acquiring Arm License.
+
 Or refer this site : https://developer.arm.com/support/licensing
 
-### 7-b Download License Server Management Software(FlexNet Publisher)
-TBD
+### 7-b. Download License Server Management Software(FlexNet Publisher)
+Download FlexNet Publisher from Arm Product Download Hub
+> https://developer.arm.com/tools-and-software/software-development-tools/license-management/downloads
 
-### 7-c Setting Up a Floating License Server
-#### 7-c-1 Installing the server software
-#### 7-c-2 Installing the server license
-#### 7-c-3 Starting the license server
-#### 7-c-4 Shutting down the license server
+Odroid HC4 is Arm Arch64, so please choose Linux AArch64 (armv8l) one to download.
 
-### 7-d Troubleshooting & Debug
+### 7-c. Setting Up a Floating License Server
+#### 7-c-1. Installing the server software
+extract `BX002-PT-00010-r11p17-02rel0.tar.gz` which is downloaded from Arm Product Download Hub.
+There will be several files extracted.
+```
+user0@hc4armkk:~$ cd <file download directory>
+user0@hc4armkk:~/Downloads$ tar xzvf BX002-PT-00010-r11p17-02rel0.tar.gz
+BX002-PT-00010-r11p17-02rel0/
+BX002-PT-00010-r11p17-02rel0/rmlinks.sh
+BX002-PT-00010-r11p17-02rel0/makelinks.sh
+BX002-PT-00010-r11p17-02rel0/armlmd
+BX002-PT-00010-r11p17-02rel0/lmgrd
+BX002-PT-00010-r11p17-02rel0/fnp_LicAdmin.pdf
+BX002-PT-00010-r11p17-02rel0/ReleaseNotes.pdf
+BX002-PT-00010-r11p17-02rel0/armlmd.opt
+BX002-PT-00010-r11p17-02rel0/armlmdiag
+BX002-PT-00010-r11p17-02rel0/lmutil
+```
 
+Change to `BX002-PT-00010-r11p17-02rel0` directory and execute `makelinks.sh`
+```
+user0@hc4armkk:~/Downloads$ cd BX002-PT-00010-r11p17-02rel0/
+user0@hc4armkk:~/Downloads/BX002-PT-00010-r11p17-02rel0 $ ./makelinks.sh
+user0@hc4armkk:~/Downloads/BX002-PT-00010-r11p17-02rel0 $ l
+armlmd*           lmborrow*  lmgrd*      lmremove*  lmswitchr*     ReleaseNotes.pdf
+armlmdiag*        lmcksum*   lmhostid*   lmreread*  lmutil*        rmlinks.sh*
+armlmd.opt        lmdiag*    lminstall*  lmstat*    lmver*
+fnp_LicAdmin.pdf  lmdown*    lmpath*     lmswitch*  makelinks.sh*
+
+```
+
+move these files into `/usr/local/bin/`. (need root to write `/usr/local/bin/`)
+```
+user0@hc4armkk:~/Downloads/BX002-PT-00010-r11p17-02rel0 $ sudo mv * /usr/local/bin/
+user0@hc4armkk:~/Downloads/BX002-PT-00010-r11p17-02rel0 $ ls /usr/local/bin/
+armlmd      fnp_LicAdmin.pdf  lmdiag  lmhostid   lmremove  lmswitch   lmver             rmlinks.sh
+armlmdiag   lmborrow          lmdown  lminstall  lmreread  lmswitchr  makelinks.sh
+armlmd.opt  lmcksum           lmgrd   lmpath     lmstat    lmutil     ReleaseNotes.pdf
+```
+
+#### 7-c-2. Installing the server license
+Make a directory to store your license.
+```
+user0@hc4armkk:~ $ mkdir ~/License
+```
+
+Move or download your Arm license into the license directory you just made.
+Then open a text editor to modify your license.dat file.
+Replace `this_host` in the license file with the corresponding server name.
+And assign a port for access (we set port 27000 here)
+> SERVER `hc4armkk` 001E064900CE `27000`
+
+#### 7-c-3. Starting the license server
+To start the license server software on a Unix/Linux server, go to the directory containing the license server software and type:
+> nohup lmgrd -c `license_file_name` -l `logfile_name`
+```
+user0@hc4armkk:~/License $ nohup lmgrd -c license.dat -l lm.log
+```
+
+After you have started the license server, you can type the below to see the most recent output from the license server.
+> tail -f `logfile_name`
+```
+user0@hc4armkk:~/License $ tail -f lm.log
+```
+
+In addition, you can type the below to check if the server up or not.
+> lmutil lmstat
+```
+user0@hc4armkk:~/License $ lmutil lmstat
+lmutil - Copyright (c) 1989-2020 Flexera. All Rights Reserved.
+Flexible License Manager status on Fri 5/14/2021 14:00
+
+License server status: 27000@hc4armkk
+    License file(s) on hc4armkk: /home/user0/License/license.dat:
+
+  hc4armkk: license server UP (MASTER) v11.17.2
+
+Vendor daemon status (on hc4armkk):
+
+    armlmd: UP v11.17.2
+
+```
+
+#### 7-c-4. Shutting down the license server
+> lmutil lmdown -q -c `license_file_name`
+``` 
+user0@hc4armkk:~/License $ lmutil lmdown -q -c license.dat
+
+```
+
+### 7-d. Troubleshooting
+a. Check whether deamon up or not
+``` 
+lmutil lmstat
+``` 
+
+b. Check whether process up or not (need root)
+``` 
+sudo lsof -i -P -n | grep LISTEN | grep armlmd
+sudo lsof -i -P -n | grep LISTEN | grep lmgrd
+``` 
+
+c. Check whether acess is blocked by firewall or internet issue. 
+> nc -vz `server ip` `port`
+``` 
+nc -vz hc4armkk.local 27000
+``` 
+
+If below error shows up
+> Ncat: Connection refused.
+
+> Ncat: No route to host.
+
+Try to open the port of the firewall (root need)
+> sudo firewall-cmd --add-port=`port` /tcp --permanent
+```
+user0@hc4armkk:~$ sudo firewall-cmd --add-port=27000/tcp --permanent
+```
 
 ## Appendix Revision history
 - v2.0: Add Arm License server installation
 - v1.1: update for stability and multi-platform support(Win10 docker and RPi4 native), 2020-Jan-30
 - v1.0: initial version, 2021-Jan-19
-
