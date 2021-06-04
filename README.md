@@ -423,6 +423,39 @@ Try to open the port of the firewall (root need)
 user0@hc4armkk:~$ sudo firewall-cmd --add-port=27000/tcp --permanent
 ```
 
+### 7-e. Client License Configuration 
+https://developer.arm.com/documentation/dui0209/h/configuring-a-client-to-use-a-license-server?lang=en
+
+#### 7-e-1. Linux (Shell)
+
+If you are using csh or tcsh, you can set the environment variable for a single server as follows:
+
+```
+setenv ARMLMD_LICENSE_FILE <port>@<my_server>
+```
+
+If you are using bash or sh, an example would be:
+```
+ARMLMD_LICENSE_FILE=<port>@<my_server>
+export ARMLMD_LICENSE_FILE
+```
+
+#### 7-e-2. Linux (.flexlmrc)
+
+You can edit a file in your home directory called .flexlmrc in order to set up client licensing. To do this, add the following line to .flexlmrc:
+
+> ARMLMD_LICENSE_FILE=value
+
+where value is the value to which you want to set the environment variable, such as `port@my_server`.
+
+#### 7-e-3. Windows
+If you are using the Control Panel, then you can set the environment variable as follows:
+
+1. Open the Control Panel by clicking on Start → Control Panel.
+2. Double click on the System icon in the Control Panel. An easy way to find this icon is to change the Control Panel view to Classic View.
+3. Click the Advanced tab in Windows 2000 or XP, or the Advanced system settings task in Vista, then click the Environment Variables button.
+4. Create a new system environment variable, ARMLMD_LICENSE_FILE, and set its value. This must include valid port@server information. If a default port in the range between 27000 and 27009 is used on the server, then the port number is omitted in the environment variable. If you are using a single server floating license, you would set the environment variable value to something similar to: 8224@my_server If you are using a three server license, or wish to refer to more than one license server, you would set the environment variable value to something similar to: 8224@my_serverA;8224@my_serverB;@my_serverC The master server appears first, and in this example is my_serverA. The entry for my_serverC is not preceded by a port number because in this example a default port number is being used.
+
 ## Appendix Revision history
 - v2.0: Add Arm License server installation
 - v1.1: update for stability and multi-platform support(Win10 docker and RPi4 native), 2020-Jan-30
